@@ -13,7 +13,8 @@ $TempPath2= “C:\Windows\Prefetch\*”
 $TempPath3= “C:\Documents and Settings\*\Local Settings\temp\*”
 $TempPath4= “C:\Windows\Temp\*”
 $TempPath5= “C:\Users\*\Appdata\Local\Temp\*”
-$tempfolders = @($RecycleBinPath1, $RecycleBinPath2, $TempPath1, $TempPath2, $TempPath3, $TempPath4, $TempPath5)
+$TempPath6= “C:\Windows.old\*”
+$tempfolders = @($RecycleBinPath1, $RecycleBinPath2, $TempPath1, $TempPath2, $TempPath3, $TempPath4, $TempPath5, $TempPath6)
 
 function timestamp() {
     return ("$(Get-Date) >")
