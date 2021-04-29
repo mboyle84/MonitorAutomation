@@ -58,16 +58,12 @@ If (Test-Path $WindowsOld)
 			{
 				Write-Host "$(timestamp) [INFO] path does not exist $WindowsOld"
 			}
-
-
 }
 catch
 {
     Write-Host "$(timestamp) [ERROR] Encountered removing $RecycleBinPaths $WindowsOld" -ForegroundColor Red
     Write-Error $_
 }
-
-
 try
 {
     Write-Host "$(timestamp) [INFO] Looking for file(s) older then $TempRetention days in $TempPaths..."
@@ -76,7 +72,7 @@ try
 		If (Test-Path $TempPath)
 			{
 				Write-Host "$(timestamp) [INFO] path exists $TempPath"	
-				Write-Host "$(timestamp) [INFO] attempting to remove files"	
+				Write-Host "$(timestamp) [INFO] searching for files to remove"	
 				
 				foreach ($i in Get-ChildItem -Path $TempPath -Recurse)
 				{
@@ -88,7 +84,7 @@ try
 					}
 					ELSE
 					{
-						#Write-Host "$(timestamp) [INFO] Can't Removed file $i "
+						#Write-Host "$(timestamp) [INFO] Can't Removed $i "
 					}
 				}
 			}
@@ -107,3 +103,4 @@ catch
 
 
 Write-Host "$(timestamp) [INFO] Ended script successfully"
+
