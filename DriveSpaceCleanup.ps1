@@ -23,7 +23,7 @@ try
 {
 Write-Host "$(timestamp) [INFO] Beginning of drive cleaning script"
 Write-Host "$(timestamp) [INFO] Attempting to remove RecycleBin with powershell" 
-Clear-RecycleBin -Force -ErrorAction SilentlyContinue
+#Clear-RecycleBin -Force -ErrorAction SilentlyContinue
 Write-Host "$(timestamp) [INFO] Empty various recylcing and temp Folders $tempfolders" 
 Remove-Item $tempfolders -Recurse -Force -ErrorAction SilentlyContinue  
 }
