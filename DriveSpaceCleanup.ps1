@@ -21,10 +21,16 @@ $WindowsOld= “C:\Windows.old”
 $RecycleBinPaths = @($RecycleBinPath0, $RecycleBinPath1, $RecycleBinPath2, $RecycleBinPath3, $RecycleBinPath4)
 $TempPaths = @($TempPath1, $TempPath2, $TempPath3, $TempPath4, $TempPath5, $TempPath6)
 $TempRetention = 30
-$InetPubRetention = 1825
-$InetpubLogPath= "C:\inetpub\logs\LogFiles"
+$InetPubRetention = 6
+$InetpubLogPath1= "C:\inetpub\logs\LogFiles"
+$InetpubLogPath2= "D:\inetpub\logs\LogFiles"
+$InetpubLogPath3= "E:\inetpub\logs\LogFiles"
+$InetpubLogPath4= "F:\inetpub\logs\LogFiles"
+$InetpubLogPaths = @($InetpubLogPath1, $InetpubLogPath2, $InetpubLogPath3, $InetpubLogPath4)
+$InetpubYear = 0
 $Filter= "d"
-
+$FolderSize = 0
+$ZipFolder = ""
 
 function timestamp() {
     return ("$(Get-Date) >")
@@ -66,7 +72,7 @@ catch
 }
 try
 {
-    Write-Host "$(timestamp) [INFO] Looking for file(s) older then $TempRetention days in $TempPaths..."
+    Write-Host "$(timestamp) [INFO] Looking for file(s) older then $TempRetention dayss in $TempPaths..."
 	foreach ($TempPath in $TempPaths)
 	{
 		If (Test-Path $TempPath)
@@ -99,8 +105,69 @@ catch
     Write-Host "$(timestamp) [ERROR] Encountered removing $TempRetention days in $TempPaths" -ForegroundColor Red
     Write-Error $_
 }
+try
+{
+    Write-Host "$(timestamp) [INFO] Looking for log file(s) older then $InetPubRetention months in $InetpubLogPaths.."
 
+foreach ($InetpubLogPath in $InetpubLogPaths)
+	{
+		If (Test-Path $InetpubLogPath)
+			{
+				Write-Host "$(timestamp) [INFO] path exists $InetpubLogPath"	
+				Write-Host "$(timestamp) [INFO] searching for files to compress"					
+				foreach ($d in Get-ChildItem -Path $InetpubLogPath)
+				{
+					Write-Host "$(timestamp) [INFO] calculating total size for files in folder $InetpubLogPath\$d"
+					$FolderSize = Get-ChildItem $InetpubLogPath\$d | Measure-Object -Property Length -sum				
+					Write-Host "$(timestamp) [INFO] searching for files in folder $InetpubLogPath\$d"
+											foreach ($f in Get-ChildItem -Path "$InetpubLogPath\$d" )
+						{
+								#Write-Host "$(timestamp) [INFO] eval first file files $f"
+								if ($f.LastWriteTime -lt (Get-Date).AddMonths(-$InetPubRetention) -And $f.mode -notmatch $Filter)
+								{
+									#Write-Host "$(timestamp) [INFO] attemp ziping of $f"
+									#Write-Host "$(timestamp) [INFO] collecting year of logs"
+									$InetpubYear = $f.LastWriteTime.tostring(“yyyy”)
+									#Write-Host "$(timestamp) [INFO] year $InetpubYear"
+									#Write-Host "$(timestamp) [INFO] checking for zip $InetpubLogPath\$d\$InetpubYear.zip"
+									If (Test-Path "$InetpubLogPath\$d\$InetpubYear.zip" )
+									{
+									#Write-Host "$(timestamp) [INFO] zip found $InetpubLogPath\$d\$InetpubYear.zip"
+									#Write-Host "$(timestamp) [INFO] attempt zip of $InetpubLogPath\$d\$f to $InetpubLogPath\$d\$InetpubYear.zip"
+									Compress-Archive -Path $f.FullName -Update -DestinationPath $ZipFolder
+									Remove-Item -Path $f.FullName -Force
+									}
+									ELSE
+									{
+									#Write-Host "$(timestamp) [INFO] zip not found $InetpubLogPath\$d\$InetpubYear.zip"
+									#Write-Host "$(timestamp) [INFO] attempt zip of $InetpubLogPath\$d\$f to $InetpubLogPath\$d\$InetpubYear.zip"
+									$ZipFolder = "$InetpubLogPath\$d\$InetpubYear.zip"
+									Compress-Archive -Path $f.FullName -DestinationPath $ZipFolder
+									Remove-Item -Path $f.FullName -Force
+									}																	
+								}
+								ELSE
+								{
+									#Write-Host "$(timestamp) [INFO] Can't zip $f "
+								}							
+						}	
+					Write-Host "$(timestamp) [INFO] pre compress total $InetpubLogPath\$d"
+					echo $FolderSize.Sum
+					$FolderSize = Get-ChildItem $InetpubLogPath\$d | Measure-Object -Property Length -sum
+					Write-Host "$(timestamp) [INFO] post compress total $InetpubLogPath\$d"
+					echo $FolderSize.Sum
+				}
+			}
+			ELSE
+			{
+				Write-Host "$(timestamp) [INFO] path does not exist $InetpubLogPath"
+			}	
+	}
 
-
+}
+catch
+{
+    Write-Host "$(timestamp) [ERROR] Encountered ziping $InetPubRetention days in $InetpubLogPaths" -ForegroundColor Red
+    Write-Error $_
+}
 Write-Host "$(timestamp) [INFO] Ended script successfully"
-
