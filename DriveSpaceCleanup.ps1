@@ -1,5 +1,4 @@
-#written by: Mike Boyle 2021 April 27
-#Contact: michael.boylestaples.ca
+#written by: Mike 2021 April 27
 #
 #error handling and logging
 #Set-StrictMode -Version latest
@@ -143,7 +142,7 @@ foreach ($InetpubLogPath in $InetpubLogPaths)
 					Write-Host "$(timestamp) [INFO] calculating total size for files in folder $InetpubLogPath\$d"
 					$FolderSize = Get-ChildItem $InetpubLogPath\$d | Measure-Object -Property Length -sum				
 					Write-Host "$(timestamp) [INFO] searching for files in folder $InetpubLogPath\$d"
-											foreach ($f in Get-ChildItem -Path "$InetpubLogPath\$d" )
+						foreach ($f in Get-ChildItem -Path "$InetpubLogPath\$d" )
 						{
 								#Write-Host "$(timestamp) [INFO] eval first file files $f"
 								if ($f.LastWriteTime -lt (Get-Date).AddMonths(-$InetPubRetention) -And $f.mode -notmatch $Filter)
