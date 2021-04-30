@@ -1,4 +1,5 @@
-#written by: Mike 2021 April 27
+#written by: Mike Boyle 2021 April 27
+#Contact: michael.boylestaples.ca
 #
 #error handling and logging
 #Set-StrictMode -Version latest
@@ -35,10 +36,32 @@ $ZipFolder = ""
 function timestamp() {
     return ("$(Get-Date) >")
 }
+function drivespace() {
+  $env:computername
+$disks = Get-WmiObject Win32_LogicalDisk -ComputerName $env:computername -Filter DriveType=3 | 
+        Select-Object DeviceID, 
+            @{'Name'='Size'; 'Expression'={[math]::truncate($_.size / 1GB)}}, 
+            @{'Name'='Freespace'; 'Expression'={[math]::truncate($_.freespace / 1GB)}}
+    
+    foreach ($disk in $disks)
+    {
+        $disk.DeviceID + $disk.FreeSpace.ToString("N0") + "GB / " + $disk.Size.ToString("N0") + "GB"
 
+    }
+}
 try
 {
 Write-Host "$(timestamp) [INFO] Beginning of drive/volume space cleaning script"
+Write-Host "$(timestamp) [INFO] calculating drive space"
+(drivespace)
+}
+catch
+{
+    Write-Host "$(timestamp) [ERROR] Encountered calculating drive space" -ForegroundColor Red
+    Write-Error $_
+}
+try
+{
 Write-Host "$(timestamp) [INFO] Remove attempt of $RecycleBinPaths $WindowsOld"
 foreach ($RecycleBinPath in $RecycleBinPaths)
 	{
@@ -171,3 +194,4 @@ catch
     Write-Error $_
 }
 Write-Host "$(timestamp) [INFO] Ended script successfully"
+(drivespace)
