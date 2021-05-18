@@ -11,6 +11,7 @@ $IPAddress = $args[0]
 $SystemName = $args[1]
 $DisplayName = $args[2]
 $script = "D:\Scripts\DriveSpaceCleanerRemote.ps1"
+$eventsource = "SCDriveSpaceCleanerRemote.ps1"
 
 #$SystemName = "conrch1wppfil03"
 
@@ -21,6 +22,8 @@ function timestamp() {
 try
 {
 Write-output "$(timestamp) [INFO] Beginning of connection script" >> $Logfile
+New-EventLog -LogName Application -Source $eventsource -ErrorAction Ignore| Out-Null
+Write-EventLog -LogName "Application" -Source $eventsource -EventID 3001 -EntryType Information -Message "Beginning of connection script,for more details review log at $Logfile " -Category 1 -RawData 10,20
 Write-output "$(timestamp) [INFO] attempt to run commands on host $SystemName" >> $Logfile
 whoami >> $Logfile
     if ( [bool](Test-WSMan -ComputerName $SystemName -ErrorAction SilentlyContinue) ) {
@@ -48,3 +51,4 @@ catch
     Write-output $_ >> $Logfile
 }
 Write-output "$(timestamp) [INFO] connection Script complete" >> $Logfile
+Write-EventLog -LogName "Application" -Source $eventsource -EventID 3001 -EntryType Information -Message "connection Script complete, for more details review log at $Logfile" -Category 1 -RawData 10,20
