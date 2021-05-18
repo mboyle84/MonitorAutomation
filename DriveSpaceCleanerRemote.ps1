@@ -33,7 +33,7 @@ $Filter= "d"
 $FolderSize = 0
 $ZipFolder = ""
 $NodeLogfile = "C:\DriveCleanupLog.txt"
-
+$eventsource = "SCDriveSpaceCleanerRemote.ps1"
 
 function timestamp() {
     return ("$(Get-Date) >")
@@ -53,6 +53,8 @@ $disks = Get-WmiObject Win32_LogicalDisk -ComputerName $env:computername -Filter
 try
 {
 Write-output "$(timestamp) [INFO] Beginning of drive/volume space cleaning script"  >> $NodeLogfile
+New-EventLog -LogName Application -Source $eventsource -ErrorAction Ignore| Out-Null
+Write-EventLog -LogName "Application" -Source $eventsource -EventID 3001 -EntryType Information -Message "Beginning of drive/volume space cleaning script, for more details review log at D:\Scripts\Logs\DriveCleanupConnectionLog.txt" -Category 1 -RawData 10,20
 whoami >> $NodeLogfile
 Write-output "$(timestamp) [INFO] calculating drive space on "$SystemName >> $NodeLogfile
 (drivespace)        
@@ -198,3 +200,5 @@ catch
 }
 Write-output "$(timestamp) [INFO] Ended script successfully" >> $NodeLogfile
 (drivespace)
+Write-EventLog -LogName "Application" -Source $eventsource -EventID 3001 -EntryType Information -Message "Ended script successfully, for more details review log at D:\Scripts\Logs\DriveCleanupConnectionLog.txt" -Category 1 -RawData 10,20
+
